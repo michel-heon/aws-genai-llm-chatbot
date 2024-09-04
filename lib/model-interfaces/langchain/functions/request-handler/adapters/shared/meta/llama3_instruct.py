@@ -12,13 +12,13 @@ EOD = "<|eot_id|>"
 
 Llama3Prompt = f"""{BEGIN_OF_TEXT}{SYSTEM_HEADER}
 
-You are an helpful assistant that provides concise answers to user questions with as little sentences as possible and at maximum 3 sentences. You do not repeat yourself. You avoid bulleted list or emojis.{EOD}{{chat_history}}{USER_HEADER}
+Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.{EOD}{{chat_history}}{USER_HEADER}
 
 Context: {{input}}{EOD}{ASSISTANT_HEADER}"""
 
 Llama3QAPrompt = f"""{BEGIN_OF_TEXT}{SYSTEM_HEADER}
 
-Use the following conversation history and pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. You do not repeat yourself. You avoid bulleted list or emojis.{EOD}{{chat_history}}{USER_HEADER}
+Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.{EOD}{{chat_history}}{USER_HEADER}
 
 Context: {{context}}
 

@@ -6,13 +6,13 @@ from langchain.prompts import PromptTemplate
 
 
 Llama2ChatPrompt = """<s>[INST] <<SYS>>
-You are an helpful assistant that provides concise answers to user questions with as little sentences as possible and at maximum 3 sentences. You do not repeat yourself. You avoid bulleted list or emojis.
+Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.
 <</SYS>>
 
 {chat_history}<s>[INST] Context: {input} [/INST]"""
 
 Llama2ChatQAPrompt = """<s>[INST] <<SYS>>
-Use the following conversation history and pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. You do not repeat yourself. You avoid bulleted list or emojis.
+Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.
 <</SYS>>
 
 {chat_history}<s>[INST] Context: {context}

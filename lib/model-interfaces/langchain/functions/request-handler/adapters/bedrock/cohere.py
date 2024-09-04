@@ -40,7 +40,7 @@ class BedrockCohereCommandAdapter(ModelAdapter):
     def get_prompt(self):
         template = """
 
-Human: The following is a friendly conversation between a human and an AI. If the AI does not know the answer to a question, it truthfully says it does not know.
+Human: Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.
 
 Current conversation:
 {chat_history}

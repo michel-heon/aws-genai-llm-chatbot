@@ -1,0 +1,13 @@
+{
+  "gpt-tstGenAIChatBotStack": {
+    "ChatBotApiGraphqlAPIURL702C0AD7": "https://e4f25e7e2rbr3adl2aynwln5cy.appsync-api.us-east-1.amazonaws.com/graphql",
+    "SharedApiKeysSecretName3D265ECA": "SharedApiKeysSecret9EA666ED-dUQxwoUyHlhc",
+    "IdeficsInterfaceChatbotFilesPrivateApiEndpoint914161CC": "https://tv702jrfpi.execute-api.us-east-1.amazonaws.com/prod/",
+    "AuthenticationIdentityPoolIdB65295D6": "us-east-1:6d8af6b4-7fc9-4dc3-a6b1-31688227ca42",
+    "AuthenticationUserPoolWebClientId80D5526A": "20tji7dnu632ot6jkltik7pvdr",
+    "UserInterfacePublicWebsiteUserInterfaceDomainName0AFFF237": "https://d2k5g8mh3gi06s.cloudfront.net",
+    "AuthenticationUserPoolLink55CE7EC4": "https://us-east-1.console.aws.amazon.com/cognito/v2/idp/user-pools/us-east-1_Kfvg1wKsn/users?region=us-east-1",
+    "ChatBotApiGraphqlapiIdF7B33EFE": "e77ypi4oazcefdno2mai3ynxpi",
+    "AuthenticationUserPoolIdF0D106F7": "us-east-1_Kfvg1wKsn"
+  }
+}

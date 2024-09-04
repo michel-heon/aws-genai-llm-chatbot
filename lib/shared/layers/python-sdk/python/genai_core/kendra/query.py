@@ -24,7 +24,11 @@ def query_workspace_kendra(
 
     if kendra_index_external or kendra_use_all_data:
         result = kendra.retrieve(
-            IndexId=kendra_index_id, QueryText=query, PageSize=limit, PageNumber=1
+            IndexId=kendra_index_id,
+            QueryText=query,
+            PageSize=limit,
+            PageNumber=1,
+            AttributeFilter={'AndAllFilters': [{"EqualsTo": {"Key": "_language_code","Value": {"StringValue": "fr"}}}]}
         )
     else:
         result = kendra.retrieve(
@@ -32,14 +36,12 @@ def query_workspace_kendra(
             QueryText=query,
             PageSize=limit,
             PageNumber=1,
-            AttributeFilter={
-                "EqualsTo": {
-                    "Key": "workspace_id",
-                    "Value": {
-                        "StringValue": workspace_id,
-                    },
-                }
-            },
+            AttributeFilter={'AndAllFilters':
+                [
+                    {"EqualsTo": {"Key": "_language_code","Value": {"StringValue": "fr"}}},
+                    {"EqualsTo": {"Key": "workspace_id","Value": {"StringValue": workspace_id}}}
+                ]
+            }
         )
 
     items = result["ResultItems"]
