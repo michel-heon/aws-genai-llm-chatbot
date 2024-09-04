@@ -10,7 +10,7 @@ from aws_lambda_powertools.utilities.batch.exceptions import BatchProcessingErro
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
-import adapters
+import adapters  # noqa: F401 Needed to register the adapters
 from genai_core.utils.websocket import send_to_client
 from genai_core.types import ChatbotAction
 
@@ -144,7 +144,9 @@ def handle_failed_records(records):
                 "timestamp": str(int(round(datetime.now().timestamp()))),
                 "data": {
                     "sessionId": session_id,
-                    "content": str(error),
+                    # Log a vague message because the error can contain
+                    # internal information
+                    "content": "Something went wrong",
                     "type": "text",
                 },
             }
@@ -166,7 +168,12 @@ def handler(event, context: LambdaContext):
     except BatchProcessingError as e:
         logger.error(e)
 
-    logger.info(processed_messages)
+    for message in processed_messages:
+        logger.info(
+            "Request compelte with status " + message[0],
+            status=message[0],
+            cause=message[1],
+        )
     handle_failed_records(
         message for message in processed_messages if message[0] == "fail"
     )

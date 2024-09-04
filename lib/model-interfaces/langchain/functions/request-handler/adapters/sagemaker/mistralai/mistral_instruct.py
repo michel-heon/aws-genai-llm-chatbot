@@ -55,7 +55,7 @@ class SMMistralInstructAdapter(ModelAdapter):
             params["max_new_tokens"] = model_kwargs["maxTokens"]
 
         return SagemakerEndpoint(
-            endpoint_name=self.model_id,
+            endpoint_name=self.get_endpoint(self.model_id),
             region_name=os.environ["AWS_REGION"],
             content_handler=content_handler,
             model_kwargs=params,
@@ -66,7 +66,7 @@ class SMMistralInstructAdapter(ModelAdapter):
         template = """<s>[INST] Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.[/INST]
 
 {context}
-</s>[INST] {question} [/INST]"""
+</s>[INST] {question} [/INST]"""  # noqa: E501
 
         return PromptTemplate.from_template(template)
 
@@ -74,7 +74,7 @@ class SMMistralInstructAdapter(ModelAdapter):
         template = """<s>[INST] Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.[/INST]
 
 {chat_history}
-<s>[INST] {input} [/INST]"""
+<s>[INST] {input} [/INST]"""  # noqa: E501
 
         return PromptTemplate.from_template(template)
 
@@ -82,10 +82,11 @@ class SMMistralInstructAdapter(ModelAdapter):
         template = """<s>[INST] Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.[/INST]
 
 {chat_history}
-</s>[INST] {question} [/INST]"""
+</s>[INST] {question} [/INST]"""  # noqa: E501
 
         return PromptTemplate.from_template(template)
 
 
 # Register the adapter
 registry.register(r"(?i)sagemaker\.mistralai-Mistral*", SMMistralInstructAdapter)
+registry.register(r"(?i)sagemaker\.mistralai/Mistral*", SMMistralInstructAdapter)

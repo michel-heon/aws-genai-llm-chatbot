@@ -43,7 +43,7 @@ function getCountryCodesAndNames(): { message: string; name: string }[] {
 }
 
 function isValidDate(dateString: string): boolean {
-  // Check the pattern YYYY/MM/DD
+  // Check the pattern YYYY-MM-DD
   const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
   if (!regex.test(dateString)) {
     return false;
@@ -202,6 +202,7 @@ const embeddingModels = [
       // Advanced settings
 
       options.createVpcEndpoints = config.vpc?.createVpcEndpoints;
+      options.logRetention = config.logRetention;
       options.privateWebsite = config.privateWebsite;
       options.certificate = config.certificate;
       options.domain = config.domain;
@@ -256,6 +257,12 @@ async function processCreateOptions(options: any): Promise<void> {
       message: "Prefix to differentiate this deployment",
       initial: options.prefix,
       askAnswered: false,
+      validate(value: string) {
+        const regex = /^[a-zA-Z0-9-]{0,10}$/;
+        return regex.test(value)
+          ? true
+          : "Only letters, numbers, and dashes are allowed. The max length is 10 characters.";
+      },
     },
     {
       type: "confirm",
@@ -549,7 +556,7 @@ async function processCreateOptions(options: any): Promise<void> {
       type: "confirm",
       name: "enableScheduleEndDate",
       message:
-        "Would you like to set an end data for the start schedule? (after this date the models would no longer start)",
+        "Would you like to set an end date for the start schedule? (after this date the models would no longer start)",
       initial: options.enableScheduleEndDate || false,
       skip(): boolean {
         return !(this as any).state.answers.enableSagemakerModelsSchedule;
@@ -566,7 +573,7 @@ async function processCreateOptions(options: any): Promise<void> {
         }
         return (
           isValidDate(v) ||
-          "The date must be in format YYYY/MM/DD and be in the future"
+          "The date must be in format YYYY-MM-DD and be in the future"
         );
       },
       skip(): boolean {
@@ -802,6 +809,24 @@ async function processCreateOptions(options: any): Promise<void> {
   const models: any = await enquirer.prompt(modelsPrompts);
 
   const advancedSettingsPrompts = [
+    {
+      type: "input",
+      name: "logRetention",
+      message: "For how long do you want to store the logs (in days)?",
+      initial: options.logRetention ? String(options.logRetention) : "7",
+      validate(value: string) {
+        // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html#cfn-logs-loggroup-retentionindays
+        const allowed = [
+          1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096,
+          1827, 2192, 2557, 2922, 3288, 3653,
+        ];
+        if (allowed.includes(Number(value))) {
+          return true;
+        } else {
+          return "Allowed values are: " + allowed.join(", ");
+        }
+      },
+    },
     {
       type: "confirm",
       name: "createVpcEndpoints",
@@ -1081,6 +1106,9 @@ async function processCreateOptions(options: any): Promise<void> {
         }
       : undefined,
     privateWebsite: advancedSettings.privateWebsite,
+    logRetention: advancedSettings.logRetention
+      ? Number(advancedSettings.logRetention)
+      : undefined,
     certificate: advancedSettings.certificate,
     domain: advancedSettings.domain,
     cognitoFederation: advancedSettings.cognitoFederationEnabled

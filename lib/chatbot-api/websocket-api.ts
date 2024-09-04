@@ -17,11 +17,13 @@ interface RealtimeGraphqlApiBackendProps {
   readonly shared: Shared;
   readonly userPool: UserPool;
   readonly api: appsync.GraphqlApi;
+  readonly logRetention?: number;
 }
 
 export class RealtimeGraphqlApiBackend extends Construct {
   public readonly messagesTopic: sns.Topic;
   public readonly resolvers: RealtimeResolvers;
+  public readonly queue: sqs.Queue;
 
   constructor(
     scope: Construct,
@@ -63,6 +65,7 @@ export class RealtimeGraphqlApiBackend extends Construct {
       userPool: props.userPool,
       shared: props.shared,
       api: props.api,
+      logRetention: props.logRetention,
     });
 
     // Route all outgoing messages to the websocket interface queue
@@ -80,6 +83,7 @@ export class RealtimeGraphqlApiBackend extends Construct {
 
     this.messagesTopic = messagesTopic;
     this.resolvers = resolvers;
+    this.queue = queue;
 
     /**
      * CDK NAG suppression

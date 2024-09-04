@@ -66,7 +66,7 @@ class SMMixtralInstructAdapter(ModelAdapter):
         template = """<s>[INST] Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.[/INST]
 
 {context}
-</s>[INST] {question} [/INST]"""
+</s>[INST] {question} [/INST]"""  # noqa: E501
 
         return PromptTemplate.from_template(template)
 
@@ -74,7 +74,7 @@ class SMMixtralInstructAdapter(ModelAdapter):
         template = """<s>[INST] Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.[/INST]
 
 {chat_history}
-<s>[INST] {input} [/INST]"""
+<s>[INST] {input} [/INST]"""  # noqa: E501
 
         return PromptTemplate.from_template(template)
 
@@ -82,7 +82,7 @@ class SMMixtralInstructAdapter(ModelAdapter):
         template = """<s>[INST] Ce qui suit est une conversation amicale entre un humain et une IA. Si l'IA ne connaît pas la réponse à une question, elle dit sincèrement qu'elle ne sait pas. De plus, l'IA répondra en Français et l'IA donnera toutes les références associées à chaque réponse.[/INST]
 
 {chat_history}
-</s>[INST] {question} [/INST]"""
+</s>[INST] {question} [/INST]"""  # noqa: E501
 
         return PromptTemplate.from_template(template)
 

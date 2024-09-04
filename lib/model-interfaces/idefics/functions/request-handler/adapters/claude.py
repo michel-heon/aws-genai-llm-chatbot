@@ -1,26 +1,39 @@
+from aws_lambda_powertools import Logger
+import boto3
 from .base import MultiModalModelBase
-from genai_core.types import ChatbotAction, ChatbotMessageType
-from urllib.parse import urljoin
+from genai_core.types import ChatbotMessageType
 import os
 from genai_core.clients import get_bedrock_client
 import json
-import requests
 from base64 import b64encode
 from genai_core.registry import registry
+
+logger = Logger()
+s3 = boto3.resource("s3")
 
 
 def get_image_message(
     file: dict,
 ):
-    img = requests.get(
-        f"{urljoin(os.environ['CHATBOT_FILES_PRIVATE_API'], file['key'])}"
-    ).content
+    if file["key"] is None:
+        raise Exception("Invalid S3 Key " + file["key"])
+
+    logger.info(
+        "Fetching image",
+        bucket=os.environ["CHATBOT_FILES_BUCKET_NAME"],
+        key="public/" + file["key"],
+    )
+
+    response = s3.Object(
+        os.environ["CHATBOT_FILES_BUCKET_NAME"], "public/" + file["key"]
+    )
+    img = str(b64encode(response.get()["Body"].read()), "ascii")
     return {
         "type": "image",
         "source": {
             "type": "base64",
             "media_type": "image/jpeg",
-            "data": str(b64encode(img), "ascii"),
+            "data": img,
         },
     }
 
@@ -69,7 +82,7 @@ class Claude3(MultiModalModelBase):
         )
 
     def handle_run(self, prompt: str, model_kwargs: dict):
-        print(model_kwargs)
+        logger.info("Incoming request for claude", model_kwargs=model_kwargs)
         body = json.loads(prompt)
 
         if "temperature" in model_kwargs:
@@ -94,7 +107,7 @@ class Claude3(MultiModalModelBase):
     def clean_prompt(self, prompt: str) -> str:
         p = json.loads(prompt)
         for m in p["messages"]:
-            if m["role"] == "user" and type(m["content"]) == type([]):
+            if m["role"] == "user" and type(m["content"]) == type([]):  # noqa: E721
                 for c in m["content"]:
                     if c["type"] == "image":
                         c["source"]["data"] = ""

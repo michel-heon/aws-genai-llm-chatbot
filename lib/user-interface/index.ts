@@ -75,7 +75,9 @@ export class UserInterface extends Construct {
         websiteBucket: websiteBucket,
       });
       distribution = publicWebsite.distribution;
-      this.publishedDomain = distribution.distributionDomainName;
+      this.publishedDomain = props.config.domain
+        ? props.config.domain
+        : publicWebsite.distribution.distributionDomainName;
       redirectSignIn = `https://${this.publishedDomain}`;
     }
 
@@ -103,7 +105,6 @@ export class UserInterface extends Construct {
       aws_appsync_graphqlEndpoint: props.api.graphqlApi.graphqlUrl,
       aws_appsync_region: cdk.Aws.REGION,
       aws_appsync_authenticationType: "AMAZON_COGNITO_USER_POOLS",
-      aws_appsync_apiKey: props.api.graphqlApi?.apiKey,
       Storage: {
         AWSS3: {
           bucket: props.chatbotFilesBucket.bucketName,
@@ -206,8 +207,9 @@ export class UserInterface extends Construct {
                 },
               };
 
-              execSync(`npm --silent --prefix "${appPath}" ci`, options);
-              execSync(`npm --silent --prefix "${appPath}" run build`, options);
+              // Safe because the command is not user provided
+              execSync(`npm --silent --prefix "${appPath}" ci`, options); //NOSONAR Needed for the build process.
+              execSync(`npm --silent --prefix "${appPath}" run build`, options); //NOSONAR
               Utils.copyDirRecursive(buildPath, outputDir);
             } catch (e) {
               console.error(e);

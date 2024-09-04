@@ -35,12 +35,14 @@ export class LangChainInterface extends Construct {
         path.join(__dirname, "./functions/request-handler")
       ),
       handler: "index.handler",
+      description: "Langchain request handler",
       runtime: props.shared.pythonRuntime,
       architecture: props.shared.lambdaArchitecture,
       tracing: lambda.Tracing.ACTIVE,
       timeout: cdk.Duration.minutes(15),
       memorySize: 1024,
-      logRetention: logs.RetentionDays.ONE_WEEK,
+      logRetention: props.config.logRetention ?? logs.RetentionDays.ONE_WEEK,
+      loggingFormat: lambda.LoggingFormat.JSON,
       layers: [props.shared.powerToolsLayer, props.shared.commonLayer],
       environment: {
         ...props.shared.defaultEnvironmentVariables,
@@ -182,7 +184,7 @@ export class LangChainInterface extends Construct {
       }
     }
 
-    if (props.config.rag.engines.knowledgeBase.enabled) {
+    if (props.config.rag.engines.knowledgeBase?.enabled) {
       for (const item of props.config.rag.engines.knowledgeBase.external ||
         []) {
         if (item.roleArn) {
@@ -234,7 +236,7 @@ export class LangChainInterface extends Construct {
       enforceSSL: true,
     });
 
-    const queue = new sqs.Queue(this, "Queue", {
+    const queue = new sqs.Queue(this, "LangChainIngestionQueue", {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       // https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-queueconfig
       visibilityTimeout: cdk.Duration.minutes(15 * 6),
@@ -275,7 +277,7 @@ export class LangChainInterface extends Construct {
         resources: [endpoint.ref],
       })
     );
-    const cleanName = name.replace(/[\s.\-_]/g, "").toUpperCase();
+    const cleanName = name.replace(/[\s./\-_]/g, "").toUpperCase();
     this.requestHandler.addEnvironment(
       `SAGEMAKER_ENDPOINT_${cleanName}`,
       endpoint.attrEndpointName
