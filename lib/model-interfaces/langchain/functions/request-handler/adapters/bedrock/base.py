@@ -34,9 +34,7 @@ class BedrockChatAdapter(ModelAdapter):
 
     def get_qa_prompt(self):
         system_prompt = (
-            "Use the following pieces of context to answer the question at the end."
-            " If you don't know the answer, just say that you don't know, "
-            "don't try to make up an answer. \n\n{context}"
+            "Vous êtes un assistant IA utilisant la Génération Augmentée par Récupération (RAG). Répondez aux questions de l'utilisateur uniquement en vous basant sur  les informations contenues dans les documents fournis. N'ajoutez aucune information supplémentaire et ne faites aucune supposition qui ne soit pas directement soutenue par ces documents. Si vous ne trouvez pas la réponse dans les documents, informez l'utilisateur que l'information n'est pas disponible. Si possible, dressez la liste des documents référencés. \n\n{context}"
         )
         return ChatPromptTemplate.from_messages(
             [
@@ -67,8 +65,7 @@ class BedrockChatAdapter(ModelAdapter):
 
     def get_condense_question_prompt(self):
         contextualize_q_system_prompt = (
-            "Given the following conversation and a follow up"
-            " question, rephrase the follow up question to be a standalone question."
+            "Vous êtes un assistant IA capable de répondre aux questions en fonction de vos connaissances préalables. Répondez aux questions de l'utilisateur uniquement avec des informations que vous connaissez déjà. N'ajoutez aucune information non vérifiée ou spéculative. Si vous ne connaissez pas la réponse à une question, informez l'utilisateur que vous n'avez pas suffisamment d'informations pour répondre. Si possible, dressez la liste des documents référencés."
         )
         return ChatPromptTemplate.from_messages(
             [
@@ -114,12 +111,13 @@ class BedrockChatNoSystemPromptAdapter(BedrockChatAdapter):
     """Some models do not support system and message history in the conversion API"""
 
     def get_prompt(self):
-        template = """The following is a friendly conversation between a human and an AI. If the AI does not know the answer to a question, it truthfully says it does not know.
+        template = """Vous êtes un assistant IA utilisant la Génération Augmentée par Récupération (RAG). Répondez aux questions de l'utilisateur uniquement en vous basant sur  les informations contenues dans les documents fournis. N'ajoutez aucune information supplémentaire et ne faites aucune supposition qui ne soit pas directement soutenue par ces documents. Si vous ne trouvez pas la réponse dans les documents, informez l'utilisateur que l'information n'est pas disponible. Si possible, dressez la liste des documents référencés.
 
-Current conversation:
+
+Conversation en cours:
 {chat_history}
 
-Question: {input}
+La question: {input}
 
 Assistant:"""  # noqa: E501
         return PromptTemplateWithHistory(
@@ -127,23 +125,23 @@ Assistant:"""  # noqa: E501
         )
 
     def get_condense_question_prompt(self):
-        template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language.
+        template = """A partir de la conversation suivante et d'une question de suivi, reformulez la question de suivi pour en faire une question indépendante, dans sa langue d'origine.
 
-Chat History:
+Historique du chat:
 {chat_history}
-Follow Up Input: {input}
-Standalone question:"""  # noqa: E501
+Suivi des entrées: {input}
+Question isolée:"""  # noqa: E501
         return PromptTemplateWithHistory(
             template=template, input_variables=["input", "chat_history"]
         )
 
     def get_qa_prompt(self):
-        template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+        template = """Utilisez les éléments de contexte suivants pour répondre à la question finale. Si vous ne connaissez pas la réponse, dites simplement que vous ne savez pas, n'essayez pas d'inventer une réponse.
 
 {context}
 
 Question: {input}
-Helpful Answer:"""  # noqa: E501
+Réponse utile:"""  # noqa: E501
         return PromptTemplateWithHistory(
             template=template, input_variables=["input", "content"]
         )

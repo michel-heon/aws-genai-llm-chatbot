@@ -24,6 +24,8 @@ from langchain_core.outputs import LLMResult, ChatGeneration
 from langchain_core.messages.ai import AIMessage, AIMessageChunk
 from langchain_core.messages.human import HumanMessage
 from langchain_aws import ChatBedrockConverse
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.prompts.prompt import PromptTemplate
 
 logger = Logger()
 
@@ -129,20 +131,39 @@ class ModelAdapter:
         )
 
     def get_prompt(self):
-        template = """The following is a friendly conversation between a human and an AI. If the AI does not know the answer to a question, it truthfully says it does not know.
+        template = """Vous êtes un assistant IA utilisant la Génération Augmentée par Récupération (RAG). Répondez aux questions de l'utilisateur uniquement en vous basant sur  les informations contenues dans les documents fournis. N'ajoutez aucune information supplémentaire et ne faites aucune supposition qui ne soit pas directement soutenue par ces documents. Si vous ne trouvez pas la réponse dans les documents, informez l'utilisateur que l'information n'est pas disponible. Si possible, dressez la liste des documents référencés.
 
-        Current conversation:
+
+        Conversation en cours:
         {chat_history}
 
-        Question: {input}"""  # noqa: E501
+        La question: {input}"""  # noqa: E501
 
         return PromptTemplate.from_template(template)
 
     def get_condense_question_prompt(self):
-        return CONDENSE_QUESTION_PROMPT
+        contextualize_q_system_prompt = (
+            "Vous êtes un assistant IA capable de répondre aux questions en fonction de vos connaissances préalables. Répondez aux questions de l'utilisateur uniquement avec des informations que vous connaissez déjà. N'ajoutez aucune information non vérifiée ou spéculative. Si vous ne connaissez pas la réponse à une question, informez l'utilisateur que vous n'avez pas suffisamment d'informations pour répondre. Si possible, dressez la liste des documents référencés."
+        )
+        return ChatPromptTemplate.from_messages(
+            [
+                ("system", contextualize_q_system_prompt),
+                MessagesPlaceholder("chat_history"),
+                ("human", "{input}"),
+            ]
+        )
 
     def get_qa_prompt(self):
-        return QA_PROMPT
+        system_prompt = (
+            "Vous êtes un assistant IA utilisant la Génération Augmentée par Récupération (RAG). Répondez aux questions de l'utilisateur uniquement en vous basant sur  les informations contenues dans les documents fournis. N'ajoutez aucune information supplémentaire et ne faites aucune supposition qui ne soit pas directement soutenue par ces documents. Si vous ne trouvez pas la réponse dans les documents, informez l'utilisateur que l'information n'est pas disponible. Si possible, dressez la liste des documents référencés. \n\n{context}"
+        )
+        return ChatPromptTemplate.from_messages(
+            [
+                ("system", system_prompt),
+                MessagesPlaceholder("chat_history"),
+                ("human", "{input}"),
+            ]
+        )
 
     def run_with_chain_v2(self, user_prompt, workspace_id=None):
         if not self.llm:
@@ -185,7 +206,7 @@ class ModelAdapter:
             if not self.disable_streaming and self.model_kwargs.get("streaming", False):
                 answer = ""
                 for chunk in conversation.stream(
-                    input={"input": user_prompt}, config=config
+                    input={"question": user_prompt}, config=config
                 ):
                     logger.debug("chunk", chunk=chunk)
                     if "answer" in chunk:
@@ -196,7 +217,7 @@ class ModelAdapter:
                                 answer = answer + c.get("text")
             else:
                 response = conversation.invoke(
-                    input={"input": user_prompt}, config=config
+                    input={"question": user_prompt}, config=config
                 )
                 if "answer" in response:
                     answer = response.get("answer")  # Rag flow

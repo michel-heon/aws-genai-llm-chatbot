@@ -1,0 +1,11 @@
+{
+  "gpt-demoGenAIChatBotStack": {
+    "ChatBotApiGraphqlAPIURL702C0AD7": "https://6jv3r2rntzdo5lxktodjgp5yui.appsync-api.us-east-1.amazonaws.com/graphql",
+    "SharedApiKeysSecretName3D265ECA": "SharedApiKeysSecret9EA666ED-w4KyKGlBnTql",
+    "AuthenticationUserPoolWebClientId80D5526A": "3gqj9g8681llqh52p0hkfo0ekd",
+    "UserInterfacePublicWebsiteUserInterfaceDomainName0AFFF237": "https://dftqd63ql3dzr.cloudfront.net",
+    "AuthenticationUserPoolLink55CE7EC4": "https://us-east-1.console.aws.amazon.com/cognito/v2/idp/user-pools/us-east-1_rQGN0hc8u/users?region=us-east-1",
+    "ChatBotApiGraphqlapiIdF7B33EFE": "6rxeo5bgrzej3bjjlxsr3n7gz4",
+    "AuthenticationUserPoolIdF0D106F7": "us-east-1_rQGN0hc8u"
+  }
+}
